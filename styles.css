@@ -2,7 +2,7 @@ a {
   text-decoration: none;
   display: inline-block;
   padding: 8px 16px;
-align:right
+  align:right
 }
 
 a:hover {
@@ -24,15 +24,20 @@ a:hover {
   border-radius: 50%;
 }
 
-.states :hover {
-  fill: red;
+body{
+	height:100vh;
+	font-family: 'Open Sans', sans-serif !important;
+}
+.fullpage{
+	height: 100%;
+	position: relative;
+	margin: 2%;
 }
 
-.state-borders {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 0.5px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  pointer-events: none;
+h1{
+	font-size: 45px !important;
+}
+#sub {
+	font-size: 14px;
+	margin-left:2%;
 }

@@ -1,0 +1,22 @@
+.map {
+	width:75%;
+	float:left;
+}
+.details{
+	width:25%;
+	float:right;
+}
+.states{
+	stroke: #E5E5E5;
+	stroke-width:1px;
+}
+path:hover{
+	opacity:0.7;
+}
+#card{
+	margin-right:5%;
+}
+.row{
+	margin-right:3%;
+	margin-left:3%;
+}
