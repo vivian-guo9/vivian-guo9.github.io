@@ -1,22 +1,28 @@
-.map {
-	width:75%;
-	float:left;
-}
-.details{
-	width:25%;
-	float:right;
+#details{
+	margin-right:5%;
 }
 .states{
 	stroke: #E5E5E5;
 	stroke-width:1px;
 }
+path{
+	fill:none;
+	stroke:#000000;
+}
 path:hover{
 	opacity:0.7;
-}
-#card{
-	margin-right:5%;
 }
 .row{
 	margin-right:3%;
 	margin-left:3%;
+}
+.reducedfontsize {
+     font-size:0.8rem;
+ }
+.nopadding {
+    padding: 0rem;
+}
+
+#summary{
+	margin-right:3%;
 }

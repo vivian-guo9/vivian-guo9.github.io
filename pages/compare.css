@@ -1,24 +1,22 @@
 body {
-	font-family:"avenir next", Arial, sans-serif;
 	font-size: 12px;
-	color: #696969;
 }
 
-#play-button {
-	background: #f08080;
+#play{
+	background: #b7d0a9;
 	padding-right: 26px;
+	border:none;
 	border-radius: 3px;
-	border: none;
-	color: white;
-	margin: 0;
-	padding: 0 12px;
+	color: black;
+	margin: 0,0,0,0;
+	padding: 0 10px;
 	width: 60px;
 	cursor: pointer;
-	height: 30px;
+	height: 25px;
 }
 
-#play-button:hover {
-	background-color: #696969;
+#play:hover {
+	background-color: #bdbdbd;
 }    
 
 .ticks {
@@ -55,8 +53,11 @@ body {
 	stroke-width: 1.25px;
 }
 
-.bar {
-	fill: "steelblue";
+#next-buttons{
+	margin-top:15px;
+	margin-left:60px;
 }
 
-
+#play-button{
+	margin-top:20px;
+}

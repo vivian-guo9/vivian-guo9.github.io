@@ -1,43 +1,82 @@
 a {
-  text-decoration: none;
-  display: inline-block;
-  padding: 8px 16px;
-  align:right
+	text-decoration: none;
+display: inline-block;
+padding: 8px 16px;
+align:right
 }
 
 a:hover {
-  background-color: #ddd;
-  color: black;
-}
+	  background-color: #ddd;
+color: black;
+  }
 
 .previous {
-  background-color: #f1f1f1;
-  color: black;
+	background-color: #f1f1f1;
+color: black;
 }
 
 .next {
-  background-color: #f1f1f1;
-  color: black;
+	background-color: #f1f1f1;
+color: black;
 }
 
 .round {
-  border-radius: 50%;
+	border-radius: 50%;
 }
 
-body{
-	height:100vh;
-	font-family: 'Open Sans', sans-serif !important;
+#buttons{
+	margin-top:1%;
+	margin-bottom:2%;
+	margin-right:2%;
 }
-.fullpage{
-	height: 100%;
-	position: relative;
-	margin: 2%;
+body{
+	padding-top:1%;
+	font-family:"avenir next", Arial, sans-serif;
 }
 
 h1{
-	font-size: 45px !important;
+	font-size: 48px !important;
 }
+
 #sub {
-	font-size: 14px;
+	font-size: 16px;
 	margin-left:2%;
+}
+
+#intro {
+	padding-top:3%;
+	padding-bottom:3%;
+	padding-right:5%;
+	font-size:14px;
+}
+
+#summary{
+	align: 'right';
+}
+
+.overlay {
+fill: none;
+      pointer-events: all;
+}
+.focus circle {
+fill: steelblue;
+}
+
+.focus text {
+	font-size: 11px;
+}
+
+.tooltip {
+	fill: white;
+	stroke: #000000;
+}
+
+.tooltip-date, .tooltip-cases {
+	font-weight: bold;
+	font-size: 12px;
+}
+
+#graphTitle{
+	margin-left:10%;
+	margin-bottom:5%;
 }

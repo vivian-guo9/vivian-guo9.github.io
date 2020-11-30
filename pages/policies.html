@@ -9,36 +9,35 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-	<script src="https://d3js.org/d3.v6.min.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="https://d3js.org/topojson.v2.min.js"></script>
 </head>
 <body>
-	<div class=fullpage>
+	<div class=container>
 	<h3>COVID-19 Policies in the United States </h3>
 	<hr>
 	<div class="row">
-		<div id='map' class="col-lg-9">
+		<div id='map' class="col-lg-8 col-md-6">
 			<svg id="usmap" width="960" height="600"></svg>
 		</div>
-		<div id='details' class="card panel panelbefore col-lg-3" >
-			<div id='summary'>
-				<div class="card-body reducedpadding">
-					<h4 id='card_title' class="card-title"><span id=state_name></span>  Policies</h4>	
-				</div>
-				<ul id="cardlist" class="list-group list-group-flush">
+		<div class="col-lg-4 col-md-6 card panel" id="details">
+			<div class="card-body reducedpadding">
+				<h5 id='card_title' class="card-title"><span id=state_name></span>  Policies</h5>		
+			</div>
+			<ul id="cardlist" class="list-group list-group-flush reducefontsize">
    				<ul class="list-group-item"><b>Total Cases: </b><span id="total_cases"></span></ul>
     				<ul class="list-group-item"><b>Total Deaths: </b><span id="total_deaths"></span></ul>
 				<ul class="list-group-item"><b>Statewide Mask Mandate: </b><span id="mask"></span></ul>
     				<ul class="list-group-item"><b>Lockdown Policies: </b><span id="lockdown"></span></ul>
-  				</ul>
-				<div id="line" class="line">
-					<svg id="linechart"></svg>
-				</div>
+  			</ul>
+			<div id="line">
+				<svg id="linechart" width=500px height=400px></svg>
 			</div>
 		</div>
 	</div>
-	<script src="../scripts/states.js"></script>
-	<a href="../index.html" class="previous round">&#8249;</a>
-	<a href="compare.html" class="next round">&#8250;</a>
+	<div class="row" id="buttons">
+		<a href="../index.html" class="previous round">&#8249;</a>
+		<a href="compare.html" class="next round">&#8250;</a>
 	</div>
+	<script src="../scripts/states.js"></script>
 </body>

@@ -9,16 +9,29 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-	<script src="https://d3js.org/d3.v6.min.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="https://d3js.org/topojson.v2.min.js"></script>
 </head>
 
 <body>
-<div id=page class="fullpage">
+<div id=page class="container">
 	<h1>Visualization of State Policies and COVID-19</h1>
 	<p id=sub>Exploring policies decided by state elected officials from 2016 and COVID-19 cases</p>
-<a href="#" class="previous round">&#8249;</a>
-	<a href="./pages/policies.html" class="next round">&#8250;</a>
+	<div class='row'>
+	<div id=intro class='col-lg-5'>
+		<p>The coronavirus is an ongoing pandemic that has changed the world. The high infection rate along with symptoms such as severe respiratory distress has made COVID-19 a pressing topic. In the United States there have been over 12,000,000 coronavirus cases and over 240,000 deaths. Within the US, each state chooses how to handle the spread and effects of the coronavirus. This includes possible statewide mask mandates and lockdowns. The policies are created by the local lawmakers that were elected into office in 2016. This visulization will help people discover possible connections between policies and COVID-19 cases. 
+ 		</p>
+	</div>
+	<div id=summary class='col-lg-7'>
+		<b id='graphTitle'>COVID-19 Cases in the United States over Time</b>
+		<svg id='total' width=400 height=400></svg>
+	</div>
+	</div>
+	<div id=buttons>
+		<a href="#" class="previous round">&#8249;</a>
+		<a href="./pages/policies.html" class="next round">&#8250;</a>
+	</div>
+	<script src="scripts/intro.js"></script>
 </div>
 </body>
 </html>

@@ -1,37 +1,35 @@
-//console.log("script2");
 var svg = d3.select("#usmap");
 var path = d3.geoPath();
-d3.csv("../data/election-2016.csv",function(data){
-d3.csv("../data/state_policy.csv",function(policy){
-d3.json("https://d3js.org/us-10m.v2.json", function(error, us) {
-	if (error) throw error;
-	for(var i = 0; i < data.length ; i++){
-		var name = data[i].State;
-		var val;
-		for(var j = 0; j < policy.length; j++){
-			if(name == policy[j].state){
-				data[i].mask = policy[j].mask;
-				data[i].lockdown = policy[j].lockdown;
-				data[i].start = policy[j].start;
-				data[i].end = policy[j].end;
-				break;
+
+function combinePolicy(election,policy){
+	for(var i = 0; i < policy.length; i++){
+		var name = policy[i].state;
+		for(var j = 0; j < election.length; j++){
+			if(name == election[j].State){
+				policy[i].winner = election[j].Winner;
+				policy[i].Postal = election[j].Postal;
 			}
 		}
-		if(data[i].Winner == 'Republican'){
-			val = 'Red';
-		}else{
-			val = 'Blue';
-		}
+	}
+}
+
+d3.csv("../data/election-2016.csv",function(election){
+d3.csv("../data/state_policy.csv",function(policy){
+	combinePolicy(election,policy);
+d3.json("../data/us-10m.v2.json", function(us) {
+//	if (error) throw error;
+	for(var i = 0; i < policy.length; i++){
 		for(var j = 0; j < us.objects.states.geometries.length; j++){
-			var jsonState = us.objects.states.geometries[j].properties.name;
-			if(jsonState == name){
-				us.objects.states.geometries[j].properties.color = val;
-				us.objects.states.geometries[j].properties.mask = data[i].mask;
-				us.objects.states.geometries[j].properties.lockdown = data[i].lockdown;
-				us.objects.states.geometries[j].properties.start = data[i].start;
-				us.objects.states.geometries[j].properties.end = data[i].end;				
-				us.objects.states.geometries[j].properties.postal = data[i].Postal;
+			var state = us.objects.states.geometries[j].properties.name;
+			if(state == policy[i].state){
+				us.objects.states.geometries[j].properties.color = policy[i].winner;
+				us.objects.states.geometries[j].properties.mask = policy[i].mask;
+				us.objects.states.geometries[j].properties.lockdown = policy[i].lockdown;
+				us.objects.states.geometries[j].properties.start = policy[i].start;
+				us.objects.states.geometries[j].properties.end = policy[i].end;				
+				us.objects.states.geometries[j].properties.postal = policy[i].Postal;
 				break;
+
 			}
 		}
 	}
@@ -44,14 +42,14 @@ d3.json("https://d3js.org/us-10m.v2.json", function(error, us) {
       	.attr("d", path)
 	.style("fill", function(d){
 		var value = d.properties.color;
-		if(value == 'Red'){
+		if(value == 'Republican'){
 			return "#DE0100";
 		}else{
 			return "#0015BC";
 		}
 	})
 	.on("click", function(d){
-		console.log(d.properties);
+		//console.log(d.properties);
 		var name = d3.select("#state_name")
 			.text(d.properties.name);
 		var mask = d3.select("#mask")
@@ -59,60 +57,79 @@ d3.json("https://d3js.org/us-10m.v2.json", function(error, us) {
 		var lockdown_time = d.properties.start + "-" + (d.properties.end == "" ? "continuing": d.properties.end);
 		var lockdown = d3.select("#lockdown")
 			.text(d.properties.lockdown == "yes"?lockdown_time: "no");
-		d3.csv("../data/COVID-19_Cases.csv",function(covid_parse){
-//			console.log(covid_parse);
-			return{ state: covid_parse.state, 
-				tot_cases: covid_parse.tot_cases,
-				tot_death: covid_parse.tot_death,
-				date: d3.timeParse("%-m/%-d/%Y")(covid_parse.submission_date),
-				value:covid_parse.new_case}
-		},function(covid){
-			var start = 0;
-			var end;
-			var post = d.properties.postal;
-			while(post != covid[start].state){
-				start++;
+		d3.csv("../data/COVID-19_Cases.csv",function(covid){
+			var timeParseshort = d3.timeParse("%-m/%-d/%y");
+			var timeParse = d3.timeParse("%-m/%-d/%Y");
+			var dateFormat = d3.timeFormat("%m/%d/%Y");	
+			var state = d.properties.postal;
+			var data  = covid.filter(function(d){ return d.state == state});
+		
+			for(var i =0; i < data.length; i++){
+				data[i].date = timeParse(data[i].submission_date);
+				data[i].tot_cases = +data[i].tot_cases;
 			}
-			end = start;
-			while(post == covid[end].state){
-				end++;
+
+			var start = dateFormat(timeParseshort(d.properties.start));
+			var end = dateFormat(timeParseshort(d.properties.end));
+			var startData = data.filter(function(d){return d.submission_date === start});
+			var endData = data.filter(function(d){return d.submission_date === end});
+			var lock = {};
+			if(startData.length != 0){
+				if(endData.length == 0){
+					lock = {startData};
+				}else{
+					lock = {startData,endData};
+				}
 			}
-			var state_covid=covid.slice(start,end)
-			console.log(state_covid);
-			var tot = state_covid[state_covid.length - 1].tot_cases;
+			var tot = data[data.length - 1].tot_cases;
 			var total = d3.select("#total_cases")
 				.text(tot);
-			var deaths = state_covid[state_covid.length-1].tot_death;
+			var deaths = data[data.length-1].tot_death;
 			var tot_deaths = d3.select("#total_deaths")
 				.text(deaths);
-			var width = 400;
-			var height = 400;
+			var margin = {top:30, left:50, bottom:0, right:30};
+			var width = 450 - margin.left - margin.right;			
+			var height = 400 - margin.top - margin.bottom;
+
+			var line = d3.select("#linechart");
+			line.selectAll("g").remove();
+			line.selectAll("path").remove();
+			line.selectAll(".line").remove();
+			
+			var x = d3.scaleTime().range([0,width]);
+			var y = d3.scaleLinear().range([height,0]);
+
+			var lineGraph = d3.line()
+				.x(function(d){return x(d.date)})
+				.y(function(d){return y(d.tot_cases)});
+			
+			x.domain(d3.extent(data, function(d){return d.date;}));
+			y.domain([0,d3.max(data,function(d){return d.tot_cases})]);
+
+			line.append("g")
+				.attr("transform", "translate(" + margin.left+ "," + height + ")")
+				.call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b")));
 		
-			d3.select("#line").selectAll("g").remove();
-			d3.select("#line").selectAll("path").remove();
-			var line = d3.select("#line");
-			var x = d3.scaleTime()
-				.domain(state_covid[0].date, state_covid[state_covid.length-1].date)
-				.range([0,width]);
 			line.append("g")
-				.attr("transform", "translate(0," + height + ")")
-				.call(d3.axisBottom(x));
-			var y = d3.scaleLinear()
-				.domain([0,d3.max(state_covid, function(covid_parse){return covid_parse.value;})])
-				.range([height,0]);
-			line.append("g")
+				.attr("transform", "translate(" + margin.left + ",0)")	
 				.call(d3.axisLeft(y));
 			
 			line.append("path")
-				.datum(covid)
-				.attr("fill", "none")
-				.attr("stroke", "steelblue")
-				.attr("stroke-width", 1)
-				.attr("d", d3.line()
-					.x(function(d2){return x(d2.date) })
-					.y(function(covid_parse){return y(covid_parse.value) })
-				);
-	
+				.data([data])
+				.attr("transform", "translate(" + margin.left + ",0)")
+				.attr("class", "line")
+				.attr("d", lineGraph)
+
+			line.selectAll("circle")
+				.data(lock)
+				.enter()
+				.attr("transform", "translate(" + margin.left + ",0)")
+				.append("circle")
+				.attr("fill", "red")
+				//.attr("stroke", "none")
+				.attr("cx", function(d) { return x(d.date)})
+				.attr("cy",function(d){return y(d.tot_cases)})
+				.attr("r",5);
 		});
 		//update card state name, total cases, mask mandate, lockdown policies 
 	});

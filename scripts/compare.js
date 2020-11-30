@@ -8,20 +8,21 @@ d3.csv("../data/election-2016.csv",function(election){
 				var dateFormat = d3.timeFormat("%b%e %Y");
 				var startDate = timeParse(covid[0].submission_date);
 				var endDate = timeParse(covid[covid.length-1].submission_date);
-				var sliderMargin = {top:15, right:60, bottom:15, left:60};
+				var sliderMargin = {top:20, right:20, bottom:10, left:60};
 				var sliderWidth = 960-sliderMargin.left - sliderMargin.right;
 				var sliderHeight = 100 - sliderMargin.top - sliderMargin.bottom;
 				var currVal = 0;
-
+				var clicked = false;
+				var playButton = d3.select("#play");
 				var targetVal = sliderWidth;
 				var sliderSvg = d3.select("#slider")
-				.append("svg")
-				.attr("width", sliderWidth + sliderMargin.left + sliderMargin.right)
-				.attr("height", sliderHeight + sliderMargin.top + sliderMargin.bottom)
+					.append("svg")
+					.attr("width", sliderWidth + sliderMargin.left + sliderMargin.right)
+					.attr("height", sliderHeight + sliderMargin.top + sliderMargin.bottom)
 				var x = d3.scaleTime()
-				.domain([startDate, endDate])
-				.range([0,targetVal])
-				.clamp(true);
+					.domain([startDate, endDate])
+					.range([0,targetVal])
+					.clamp(true);
 				var slider = sliderSvg.append("g")
 					.attr("class","slider")
 					.attr("transform","translate(" + sliderMargin.left + "," + sliderHeight/2 + ")");
@@ -68,6 +69,31 @@ d3.csv("../data/election-2016.csv",function(election){
 				}
 				drawPie(pieData,date);
 				drawBar(barData,date);
+				
+				playButton.on("click", function(){
+					var button = d3.select(this);
+					if(button.text() == "Pause"){
+						clicked = false;
+						clearInterval(timer);
+						button.text("Play");
+					}else{
+						clicked = true;
+						timer = setInterval(step, 100);
+						button.text("Pause");
+					}
+				});
+
+				function step(){
+					update(x.invert(currVal));
+					currVal = currVal + targetVal/100;
+					if(currVal > targetVal){
+						clicked = false;
+						currVal = 0;
+						clearInterval(timer);
+						playButton.text("Play");
+					}
+				}
+
 				var normalFormat = d3.timeFormat("%m/%d/%Y"); 
 				function update(h) {
 					handle.attr("cx", x(h));
@@ -101,6 +127,7 @@ function initData(covid,election, pop ){
 						var state = data[j].state;
 						var found = false;
 						for(var i = 0; i < election.length; i++){
+							//console.log(state, typeof(state), election[i].Postal, typeof(election[i].Postal));
 							if(state == election[i].Postal){
 								data[j].name = election[i].State;
 								data[j].winner = election[i].Winner;
@@ -120,16 +147,14 @@ function initData(covid,election, pop ){
 					}
 				var num = [repub, demo];
 				pie[date] = num;
-				/*for(var i = 0; i < data.length; i++){
+				for(var i = 0; i < barElements.length; i++){
 					for(var j = 0; j < pop.length; j++){
-						if(typeof(data[i]) !== "undefined"){
-						if(data[i].name.localeCompare(pop[j].NAME)){
-							data[i].percent = data[i].tot_cases/pop[j].POPESTIMATE2019;
+						if(barElements[i].name.localeCompare(pop[j].NAME)){
+							barElements[i].percent = barElements[i].tot_cases/pop[j].POPESTIMATE2019;
 							break;
-						}	
 						}
 					}
-				}*/
+				}
 				bar[date] = barElements;
 				currDate.setDate(currDate.getDate() + 1);
 			}
@@ -191,19 +216,19 @@ function drawPie(data, date){
 
 function drawBar(totData,date){
 	var data = totData[date];
-	console.log(data);
+//	console.log(data);
 	data = data.sort(function(a,b){
 		return a.tot_cases - b.tot_cases;
 	});
 	
 	var margin = {
 		top:40,
-		right:40,
-		bottom:20,
+		right:20,
+		bottom:10,
 		left:100
 	};
 	var width = 800 - margin.left - margin.right;
-	var height = 600 - margin.top - margin.bottom;
+	var height = 550 - margin.top - margin.bottom;
 
 	var x = d3.scaleLinear()
 		.range([0,width])
@@ -221,11 +246,11 @@ function drawBar(totData,date){
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		
 	data.forEach(function(d){
-		d.tot_cases = +d.tot_cases;
+		d.percent = +d.percent;
 	});
 	
 
-	x.domain([0, d3.max(data, function(d){ return d.tot_cases; })]);
+	x.domain([0, d3.max(data, function(d){ return d.percent.toFixed(7); })]);
 	y.domain(data.map(function(d) {return d.name; })).padding(0.1);
 
 	svg.selectAll(".bar")
@@ -234,12 +259,11 @@ function drawBar(totData,date){
 		.append("rect")
 		.attr("transform", "translate(" + margin.left+ ",0)")
 		.attr("class","bar")
-		.attr("width", function(d) {return x(d.tot_cases);})
+		.attr("width", function(d) {return x(d.percent);})
 		.attr("y", function(d) {return y(d.name); })
 		.attr("height", y.bandwidth())	
 		.attr('fill', function(d){
 				var party = d.winner;
-				console.log(d);
 				if(party == 'Republican'){
 				return "#DE0100";
 				}else{
