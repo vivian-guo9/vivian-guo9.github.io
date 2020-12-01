@@ -80,7 +80,7 @@ d3.csv("../data/election-2016.csv",function(election){
 						button.text("Play");
 					}else{
 						clicked = true;
-						timer = setInterval(step, 100);
+						timer = setInterval(step, 80);
 						button.text("Pause");
 					}
 				});
@@ -116,7 +116,7 @@ d3.csv("../data/election-2016.csv",function(election){
 
 				function step(){
 					update(x.invert(currVal));
-					currVal = currVal + targetVal/100;
+					currVal = currVal + targetVal/200;
 					if(currVal > targetVal){
 						clicked = false;
 						currVal = 0;
@@ -279,9 +279,20 @@ function drawBar(totData,date, selected){
 	data.forEach(function(d){
 		d[selected] = +d[selected];
 	});
-	
 
-	x.domain([0, d3.max(data, function(d){ return d[selected].toFixed(7); })]);
+	var max = 0;
+	for( var [key,value] of Object.entries(totData)){
+//		console.log(key,value);
+		var temp = +d3.max(value, function(d){return d[selected]});
+		//console.log(key, temp);
+		if( max < temp){
+			//console.log(key,temp);
+			max = temp;
+		}
+	}
+//	console.log(max);
+	x.domain([0, max]);
+	//x.domain([0, d3.max(data, function(d){ return d[selected].toFixed(7); })]);
 	y.domain(data.map(function(d) {return d.name; })).padding(0.1);
 	
 	var tooltip = svg.append("g").attr("class","toolTip");
@@ -301,7 +312,7 @@ function drawBar(totData,date, selected){
 		.append("rect")
 		.attr("transform", "translate(" + margin.left+ ",0)")
 		.attr("class","bar")
-		.attr("width", function(d) { console.log(x(d[selected])); return x(d[selected]);})
+		.attr("width", function(d) { return x(d[selected]);})
 		.attr("y", function(d) {return y(d.name); })
 		.attr("height", y.bandwidth())	
 		.attr('fill', function(d){
