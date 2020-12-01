@@ -9,7 +9,7 @@ d3.csv("../data/election-2016.csv",function(election){
 				var startDate = timeParse(covid[0].submission_date);
 				var endDate = timeParse(covid[covid.length-1].submission_date);
 				var sliderMargin = {top:20, right:20, bottom:10, left:60};
-				var sliderWidth = 960-sliderMargin.left - sliderMargin.right;
+				var sliderWidth = 1000-sliderMargin.left - sliderMargin.right;
 				var sliderHeight = 100 - sliderMargin.top - sliderMargin.bottom;
 				var currVal = 0;
 				var clicked = false;
@@ -67,9 +67,11 @@ d3.csv("../data/election-2016.csv",function(election){
 				if(currVal == 0){
 					date = covid[0].submission_date;
 				}
+				var options = ["total cases","new cases", "total cases as a percent of state population", "total deaths", "new deaths"]
+				var selected = "tot_cases";
 				drawPie(pieData,date);
-				drawBar(barData,date);
-				
+				drawBar(barData,date, selected);
+							
 				playButton.on("click", function(){
 					var button = d3.select(this);
 					if(button.text() == "Pause"){
@@ -82,6 +84,35 @@ d3.csv("../data/election-2016.csv",function(election){
 						button.text("Pause");
 					}
 				});
+				var dropdownChange = function(){
+					var newSelection = d3.select(this).property('value');
+					if(newSelection == "total cases"){
+						newSelection = "tot_cases";
+					}else if(newSelection =="new cases"){
+						newSelection = "new_case";
+					}else if(newSelection == "total deaths"){
+						newSelection = "tot_death";
+					}else if(newSelection == "new deaths"){
+						newSelection = "new_death";
+					}else{
+						newSelection = "percent"
+					}
+					selected=newSelection;
+					drawBar(barData, date, newSelection);
+				
+				}
+				
+				var dropdown = d3.select("#dropdown").on("change",dropdownChange);
+				
+				dropdown.selectAll("option")
+					.data(options)
+					.enter()
+					.append("option")
+					.attr("value", function(d) {return d;})
+					.text(function(d){
+						return d[0].toUpperCase() + d.slice(1,d.length);
+					});
+				
 
 				function step(){
 					update(x.invert(currVal));
@@ -101,7 +132,7 @@ d3.csv("../data/election-2016.csv",function(election){
 						.attr("x", x(h))
 						.text(dateFormat(h));
 					drawPie(pieData,normalFormat(h));
-					drawBar(barData,normalFormat(h));
+					drawBar(barData,normalFormat(h),selected);
 				}
 		});
 		});
@@ -167,9 +198,9 @@ function initData(covid,election, pop ){
 
 
 function drawPie(data, date){
-	var width = 450;
+	var width = 350;
 	var height = 450;
-	var margin = 50;
+	var margin = 20;
 	var radius = Math.min(width,height)/2 - margin;
 	var repub = data[date][0];
 	var demo = data[date][1];
@@ -214,11 +245,11 @@ function drawPie(data, date){
 		.style("fill","white");
 }
 
-function drawBar(totData,date){
+function drawBar(totData,date, selected){
 	var data = totData[date];
-//	console.log(data);
+	//console.log(selected);	
 	data = data.sort(function(a,b){
-		return a.tot_cases - b.tot_cases;
+		return a[selected] - b[selected];
 	});
 	
 	var margin = {
@@ -227,8 +258,8 @@ function drawBar(totData,date){
 		bottom:10,
 		left:100
 	};
-	var width = 800 - margin.left - margin.right;
-	var height = 550 - margin.top - margin.bottom;
+	var width = 700 - margin.left - margin.right;
+	var height = 500 - margin.top - margin.bottom;
 
 	var x = d3.scaleLinear()
 		.range([0,width])
@@ -246,12 +277,23 @@ function drawBar(totData,date){
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		
 	data.forEach(function(d){
-		d.percent = +d.percent;
+		d[selected] = +d[selected];
 	});
 	
 
-	x.domain([0, d3.max(data, function(d){ return d.percent.toFixed(7); })]);
+	x.domain([0, d3.max(data, function(d){ return d[selected].toFixed(7); })]);
 	y.domain(data.map(function(d) {return d.name; })).padding(0.1);
+	
+	var tooltip = svg.append("g").attr("class","toolTip");
+	svg.append("g")
+		.attr("class","x")
+		.attr("transform", "translate("  + margin.left +  "," + height + ")")
+		.call(d3.axisBottom(x))
+	svg.append("g")
+		.attr("class","y")
+		.attr("transform", "translate("+ margin.left+ ",0)")
+		.call(d3.axisLeft(y));
+
 
 	svg.selectAll(".bar")
 		.data(data)
@@ -259,7 +301,7 @@ function drawBar(totData,date){
 		.append("rect")
 		.attr("transform", "translate(" + margin.left+ ",0)")
 		.attr("class","bar")
-		.attr("width", function(d) {return x(d.percent);})
+		.attr("width", function(d) { console.log(x(d[selected])); return x(d[selected]);})
 		.attr("y", function(d) {return y(d.name); })
 		.attr("height", y.bandwidth())	
 		.attr('fill', function(d){
@@ -269,12 +311,52 @@ function drawBar(totData,date){
 				}else{
 				return "#0015BC";
 				}
-				});
+				})
+		.on("mousemove",function(d){
+			console.log(d);
+			tooltip
+				.attr("transform", "translate(" +margin.left+",0)")
+				.style("display", "inline-block")
+				.style("opacity", "1")
+				.html((d.name) + "<br>" + ": " + d[selected])});
 
-	svg.append("g")
+/*	svg.append("g")
 		.attr("transform", "translate("  + margin.left +  "," + height + ")")
 		.call(d3.axisBottom(x))
 	svg.append("g")
 		.attr("transform", "translate("+ margin.left+ ",0)")
 		.call(d3.axisLeft(y));
+*//*	tooltip.append("rect")
+		.attr("class","tooltip")
+		.attr("transform","translate(" +margin.left+",0)")
+		.attr("width", 110)
+		.attr("height", 50)
+		.attr("x",10)
+		.attr("y",-22)
+		.attr("rx",4)
+		.attr("ry",4)
+		.style("fill","white")
+		.style("opacity","1")
+	tooltip.append("text")
+		.attr("transform", "translate(" + margin.left + ",0)")
+		.attr("class", "tooltip-name")
+		.attr("x",18)
+		.attr("y",2)
+	tooltip.append("text")
+		.attr("transform", "translate(" + margin.left + ",0)")
+		.attr("class", "tooltip-num")
+		.attr("x",18)
+		.attr("y",18)
+	tooltip.append("rect")
+		.attr("class","overlay")
+		.attr("width",width)	
+		.attr("height",height)
+		.attr("transform", "translate(" + margin.left+ ",0)")
+		.on("mouseover", function(){focus.style("display", null);})
+		.on("mouseout", function(){focus.style("display", "none");})
+		.on("mousemove",mousemove);
+	function mousemove(){
+		var x0 = x.invert(d3.mouse(this)[0]);
+		console.log(x0);
+	}*/
 }

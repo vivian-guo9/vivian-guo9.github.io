@@ -59,7 +59,7 @@ d3.csv("../data/COVID-19_Cases.csv",function(covid){
 			.attr("transform", "translate(" + margin.left + ",0)")
 			.attr("d", lineGraph)
 
-			var focus = line.append("g")
+		var focus = line.append("g")
 			.attr("class", "focus")
 			.style("display", "none");
 

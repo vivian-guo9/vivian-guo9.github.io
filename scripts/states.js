@@ -16,42 +16,58 @@ function combinePolicy(election,policy){
 d3.csv("../data/election-2016.csv",function(election){
 d3.csv("../data/state_policy.csv",function(policy){
 	combinePolicy(election,policy);
-d3.json("../data/us-10m.v2.json", function(us) {
-//	if (error) throw error;
+d3.json("../data/us-states.json", function(error,us) {
+	if (error) throw error;
+	console.log(us);
 	for(var i = 0; i < policy.length; i++){
-		for(var j = 0; j < us.objects.states.geometries.length; j++){
-			var state = us.objects.states.geometries[j].properties.name;
+		for(var j = 0; j < us.features.length; j++){
+			var state = us.features[j].properties.NAME;
 			if(state == policy[i].state){
-				us.objects.states.geometries[j].properties.color = policy[i].winner;
-				us.objects.states.geometries[j].properties.mask = policy[i].mask;
-				us.objects.states.geometries[j].properties.lockdown = policy[i].lockdown;
-				us.objects.states.geometries[j].properties.start = policy[i].start;
-				us.objects.states.geometries[j].properties.end = policy[i].end;				
-				us.objects.states.geometries[j].properties.postal = policy[i].Postal;
+				us.features[j].properties.color = policy[i].winner;	
+				us.features[j].properties.mask = policy[i].mask;
+				us.features[j].properties.lockdown = policy[i].lockdown;
+				us.features[j].properties.start = policy[i].start;
+				us.features[j].properties.end = policy[i].end;				
+				us.features[j].properties.postal = policy[i].Postal;
 				break;
-
 			}
 		}
 	}
 
-	svg.append("g")
-	.attr("class", "states")
-    	.selectAll("path")
-    	.data(topojson.feature(us, us.objects.states).features)
-    	.enter().append("path")
-      	.attr("d", path)
-	.style("fill", function(d){
-		var value = d.properties.color;
-		if(value == 'Republican'){
-			return "#DE0100";
-		}else{
-			return "#0015BC";
-		}
-	})
+	var mapWidth = 700;
+	var mapHeight = 500;
+	var projection = d3.geoAlbersUsa()
+		.translate([mapWidth/2, mapHeight/2-25])
+		.scale([mapWidth*1.4])
+	var path=d3.geoPath()
+		.projection(projection);
+	var map = d3.select("#usmap")
+		.attr("width", mapWidth)
+		.attr("height", mapHeight)
+
+	map.append("g")
+		.attr("class","states")
+		.selectAll("path")
+		.data(us.features)
+		.enter()
+		.append("path")
+		.attr("d",path)
+		.style("stroke", "#ffffff")
+		.style("stroke-width", "1")
+		.style("fill", function(d){
+		//	console.log(d);
+			var value = d.properties.color;
+			if(value == 'Republican'){
+				return "#DE0100";
+			}else{
+				return "#0015BC";
+			}
+		})
 	.on("click", function(d){
 		//console.log(d.properties);
+		var card = d3.select("#details");
 		var name = d3.select("#state_name")
-			.text(d.properties.name);
+			.text(d.properties.NAME);
 		var mask = d3.select("#mask")
 			.text(d.properties.mask);
 		var lockdown_time = d.properties.start + "-" + (d.properties.end == "" ? "continuing": d.properties.end);
@@ -88,14 +104,16 @@ d3.json("../data/us-10m.v2.json", function(us) {
 			var tot_deaths = d3.select("#total_deaths")
 				.text(deaths);
 			var margin = {top:30, left:50, bottom:0, right:30};
-			var width = 450 - margin.left - margin.right;			
-			var height = 400 - margin.top - margin.bottom;
+			var width = 350 - margin.left - margin.right;			
+			var height = 350 - margin.top - margin.bottom;
 
 			var line = d3.select("#linechart");
 			line.selectAll("g").remove();
 			line.selectAll("path").remove();
 			line.selectAll(".line").remove();
-			
+		
+			line.style("width","350px");
+			line.style("height","350px");	
 			var x = d3.scaleTime().range([0,width]);
 			var y = d3.scaleLinear().range([height,0]);
 
@@ -107,29 +125,31 @@ d3.json("../data/us-10m.v2.json", function(us) {
 			y.domain([0,d3.max(data,function(d){return d.tot_cases})]);
 
 			line.append("g")
-				.attr("transform", "translate(" + margin.left+ "," + height + ")")
+				.attr("transform", "translate(" + margin.left+ "," + (height+10) + ")")
 				.call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b")));
 		
 			line.append("g")
-				.attr("transform", "translate(" + margin.left + ",0)")	
+				.attr("transform", "translate(" + margin.left + ",10)")	
 				.call(d3.axisLeft(y));
 			
 			line.append("path")
 				.data([data])
-				.attr("transform", "translate(" + margin.left + ",0)")
+				.attr("transform", "translate(" + margin.left + ",10)")
 				.attr("class", "line")
 				.attr("d", lineGraph)
-
+			
+			console.log(lock);
 			line.selectAll("circle")
 				.data(lock)
 				.enter()
-				.attr("transform", "translate(" + margin.left + ",0)")
+				.attr("transform", "translate(" + margin.left + ",10)")
 				.append("circle")
 				.attr("fill", "red")
 				//.attr("stroke", "none")
 				.attr("cx", function(d) { return x(d.date)})
 				.attr("cy",function(d){return y(d.tot_cases)})
 				.attr("r",5);
+			card.style("opacity","1");
 		});
 		//update card state name, total cases, mask mandate, lockdown policies 
 	});
