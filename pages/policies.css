@@ -1,5 +1,4 @@
 #details{
-	margin-right:5%;
 }
 .states{
 	stroke: #E5E5E5;
@@ -25,4 +24,18 @@ path:hover{
 
 #summary{
 	margin-right:3%;
+}
+
+#card_title{
+	padding:1rem;
+}
+.list-group-item{
+	font-size:0.8rem;
+}
+.card{
+	opacity:0;
+}
+#seeMore{
+	color: "grey";
+	font-size:0.8rem;
 }

@@ -18,12 +18,12 @@
 	<hr>
 	<div class="row">
 		<div id='map' class="col-lg-8 col-md-6">
-			<svg id="usmap" width="960" height="600"></svg>
+			<p>The map below shows the results of the 2016 Presidential Election.</p>
+			<p id="seeMore"> Click on a state to see more details about policies implemented and Covid-19 Cases</p>
+			<svg id="usmap" width="700" height="500"></svg>
 		</div>
 		<div class="col-lg-4 col-md-6 card panel" id="details">
-			<div class="card-body reducedpadding">
-				<h5 id='card_title' class="card-title"><span id=state_name></span>  Policies</h5>		
-			</div>
+			<h5 id='card_title'><span id=state_name></span>  Policies</h5>		
 			<ul id="cardlist" class="list-group list-group-flush reducefontsize">
    				<ul class="list-group-item"><b>Total Cases: </b><span id="total_cases"></span></ul>
     				<ul class="list-group-item"><b>Total Deaths: </b><span id="total_deaths"></span></ul>
@@ -31,7 +31,7 @@
     				<ul class="list-group-item"><b>Lockdown Policies: </b><span id="lockdown"></span></ul>
   			</ul>
 			<div id="line">
-				<svg id="linechart" width=500px height=400px></svg>
+				<svg id="linechart" width=370 height=370></svg>
 			</div>
 		</div>
 	</div>

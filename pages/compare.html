@@ -15,16 +15,18 @@
 	<script src="../scripts/compare.js"></script>
 </head>
 <body>
-<div>
+<div class="container">
 	<h4>Comparing COVID-19 Cases by State</h4>
 	<hr>
 	<div class="row">
-		<col>
+		<div class="col-lg-4">
+			<p>COVID-19 Cases by Political Party and State<br> Use the slider at the bottom to see how the number of cases changes over time. </p>
 			<svg id='pie'></svg>
-		</col>
-		<col>
+		</div>
+		<div class="col-lg-8">
+			<select id="dropdown"></select>
 			<svg id='bar'></svg>
-		</col>
+		</div>
 	</div>	
 	<div class="row">	
 		<div id="slider"></div>
