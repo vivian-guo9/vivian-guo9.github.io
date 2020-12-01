@@ -14,12 +14,12 @@
 </head>
 <body>
 	<div class=container>
-	<h3>COVID-19 Policies in the United States </h3>
+	<h3>COVID-19 Policies in the US by State </h3>
 	<hr>
 	<div class="row">
 		<div id='map' class="col-lg-8 col-md-6">
 			<p>The map below shows the results of the 2016 Presidential Election.</p>
-			<p id="seeMore"> Click on a state to see more details about policies implemented and Covid-19 Cases</p>
+			<p class="smallText"> Click on a state to see more details about policies implemented and Covid-19 Cases</p>
 			<svg id="usmap" width="700" height="500"></svg>
 		</div>
 		<div class="col-lg-4 col-md-6 card panel" id="details">
@@ -31,6 +31,7 @@
     				<ul class="list-group-item"><b>Lockdown Policies: </b><span id="lockdown"></span></ul>
   			</ul>
 			<div id="line">
+				<p class="smallText m-2">Total Cases in <span id=small_state_name></span> Over Time <br> Red dots indicate the start and end of lockdown<p>
 				<svg id="linechart" width=370 height=370></svg>
 			</div>
 		</div>
