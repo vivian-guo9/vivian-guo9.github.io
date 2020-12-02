@@ -80,3 +80,8 @@ fill: steelblue;
 	margin-left:10%;
 	margin-bottom:5%;
 }
+
+ .disabled {
+        pointer-events: none;
+        cursor: default;
+    }
