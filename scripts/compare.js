@@ -295,7 +295,7 @@ function drawBar(totData,date, selected){
 	//x.domain([0, d3.max(data, function(d){ return d[selected].toFixed(7); })]);
 	y.domain(data.map(function(d) {return d.name; })).padding(0.1);
 	
-	var tooltip = svg.append("g").attr("class","toolTip");
+	var tooltip = d3.select("#barDivision").append("div").attr("class","toolTip");
 	svg.append("g")
 		.attr("class","x")
 		.attr("transform", "translate("  + margin.left +  "," + height + ")")
@@ -326,48 +326,11 @@ function drawBar(totData,date, selected){
 		.on("mousemove",function(d){
 			console.log(d);
 			tooltip
-				.attr("transform", "translate(" +margin.left+",0)")
+				.style("left", d3.event.pageX-50+"px")
+				.style("top",d3.event.pageY-70+"px")
 				.style("display", "inline-block")
 				.style("opacity", "1")
-				.html((d.name) + "<br>" + ": " + d[selected])});
+				.html((d.name) + "<br>" + ": " + d[selected])
+		}).on("mouseout", function(d){ tooltip.style("display", "none");});
 
-/*	svg.append("g")
-		.attr("transform", "translate("  + margin.left +  "," + height + ")")
-		.call(d3.axisBottom(x))
-	svg.append("g")
-		.attr("transform", "translate("+ margin.left+ ",0)")
-		.call(d3.axisLeft(y));
-*//*	tooltip.append("rect")
-		.attr("class","tooltip")
-		.attr("transform","translate(" +margin.left+",0)")
-		.attr("width", 110)
-		.attr("height", 50)
-		.attr("x",10)
-		.attr("y",-22)
-		.attr("rx",4)
-		.attr("ry",4)
-		.style("fill","white")
-		.style("opacity","1")
-	tooltip.append("text")
-		.attr("transform", "translate(" + margin.left + ",0)")
-		.attr("class", "tooltip-name")
-		.attr("x",18)
-		.attr("y",2)
-	tooltip.append("text")
-		.attr("transform", "translate(" + margin.left + ",0)")
-		.attr("class", "tooltip-num")
-		.attr("x",18)
-		.attr("y",18)
-	tooltip.append("rect")
-		.attr("class","overlay")
-		.attr("width",width)	
-		.attr("height",height)
-		.attr("transform", "translate(" + margin.left+ ",0)")
-		.on("mouseover", function(){focus.style("display", null);})
-		.on("mouseout", function(){focus.style("display", "none");})
-		.on("mousemove",mousemove);
-	function mousemove(){
-		var x0 = x.invert(d3.mouse(this)[0]);
-		console.log(x0);
-	}*/
 }
